@@ -1,0 +1,11 @@
+.exceeded{
+    color:red;
+}
+table,td,th{
+    border: 1px solid #2a2d93;
+    border-collapse: collapse;
+}
+
+.invisible{
+    display: none;
+}
