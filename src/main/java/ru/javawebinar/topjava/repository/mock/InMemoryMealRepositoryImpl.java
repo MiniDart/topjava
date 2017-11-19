@@ -3,12 +3,13 @@ package ru.javawebinar.topjava.repository.mock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
-import ru.javawebinar.topjava.AuthorizedUser;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.repository.MealRepository;
+import ru.javawebinar.topjava.util.DateTimeUtil;
 import ru.javawebinar.topjava.util.MealsUtil;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -22,21 +23,26 @@ public class InMemoryMealRepositoryImpl implements MealRepository {
     private AtomicInteger counter = new AtomicInteger(0);
 
     {
-        MealsUtil.MEALS.forEach(this::save);
+        MealsUtil.MEALS.forEach(meal -> {
+            meal.setId(counter.getAndIncrement());
+            repository.put(meal.getId(),meal);
+        });
     }
 
     @Override
     public Meal save(Meal meal) {
         log.info("save {}", meal);
-        if (meal.isNew()) meal.setId(counter.getAndIncrement());
+        if (meal.isNew()) {
+            meal.setId(counter.getAndIncrement());
+        }
         repository.put(meal.getId(),meal);
         return meal;
     }
 
     @Override
-    public boolean delete(int id, int userId) {
+    public boolean delete(int id) {
         log.info("delete {}", id);
-        return repository.get(id).getUserId() == userId && repository.remove(id) != null;
+        return repository.remove(id) != null;
     }
 
     @Override
@@ -48,19 +54,18 @@ public class InMemoryMealRepositoryImpl implements MealRepository {
     }
 
     @Override
-    public List<Meal> getAll(int userId) {
-        log.info("getAll");
-        return repository.values()
-                .stream()
-                .filter((meal -> meal.getUserId()==userId))
-                .sorted(((meal, t1) -> t1.getDateTime().compareTo(meal.getDateTime())))
-                .collect(Collectors.toList());
-    }
-    @Override
-    public List<Meal> getByDate(LocalDateTime start, LocalDateTime end, int userId) {
+    public List<Meal> getByDate(LocalDate startDate, LocalDate endDate, LocalTime startTime, LocalTime endTime, int userId) {
         log.info("getByDate");
         return repository.values().stream()
-                .filter(meal -> meal.getUserId()==userId&&meal.getDateTime().isAfter(start)&&meal.getDateTime().isBefore(end))
+                .filter(meal -> meal.getUserId()==userId&&DateTimeUtil.isBetween(meal.getDate(),startDate,endDate)
+                        &&DateTimeUtil.isBetween(meal.getTime(),startTime,endTime))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Meal> getAll(int userId) {
+        return repository.values().stream()
+                .filter(meal -> meal.getUserId()==userId)
                 .collect(Collectors.toList());
     }
 }

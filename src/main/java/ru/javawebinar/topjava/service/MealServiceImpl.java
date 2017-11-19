@@ -6,7 +6,8 @@ import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.repository.MealRepository;
 import ru.javawebinar.topjava.util.exception.NotFoundException;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 
 import static ru.javawebinar.topjava.util.ValidationUtil.checkNotFoundWithId;
@@ -17,13 +18,15 @@ public class MealServiceImpl implements MealService {
     private MealRepository repository;
 
     @Override
-    public Meal create(Meal meal) {
+    public Meal create(Meal meal, int userId) {
+        meal.setUserId(userId);
         return repository.save(meal);
     }
 
     @Override
     public void delete(int id, int userId) throws NotFoundException {
-        checkNotFoundWithId(repository.delete(id,userId),id);
+        get(id,userId);
+        checkNotFoundWithId(repository.delete(id),id);
     }
 
     @Override
@@ -38,14 +41,17 @@ public class MealServiceImpl implements MealService {
 
     @Override
     public void update(Meal meal, int userId) throws NotFoundException{
-        checkNotFoundWithId(meal.getUserId()==userId,meal.getId().intValue());
-        repository.save(meal);
+        get(meal.getId(),userId);
+        meal.setUserId(userId);
+        checkNotFoundWithId(repository.save(meal),meal.getId());
     }
 
     @Override
-    public List<Meal> getByDate(LocalDateTime start, LocalDateTime end, int userId) {
-        if (start==null) start=LocalDateTime.MIN;
-        if (end==null) end=LocalDateTime.MAX;
-        return repository.getByDate(start,end, userId);
+    public List<Meal> getByDate(LocalDate startDate, LocalDate endDate, LocalTime startTime, LocalTime endTime, int userId) {
+        if (startDate ==null) startDate =LocalDate.MIN;
+        if (endDate ==null) endDate =LocalDate.MAX;
+        if (startTime==null) startTime=LocalTime.MIN;
+        if (endTime==null) endTime=LocalTime.MAX;
+        return repository.getByDate(startDate, endDate,startTime,endTime, userId);
     }
 }
