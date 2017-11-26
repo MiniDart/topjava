@@ -127,4 +127,9 @@ public class MealServiceTest {
         assertThat(service.getBetweenDateTimes(start,end,1).size()).isEqualTo(0);
     }
 
+    @Test(expected = NotFoundException.class)
+    public void updateNotFound(){
+        service.update(DATA.get(ADMIN).get(0),USER.getId());
+    }
+
 }
