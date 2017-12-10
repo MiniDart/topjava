@@ -1,6 +1,7 @@
 package ru.javawebinar.topjava.service;
 
 import org.junit.AfterClass;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -16,6 +17,7 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlConfig;
 import org.springframework.test.context.junit4.SpringRunner;
 import ru.javawebinar.topjava.ActiveDbProfileResolver;
+import ru.javawebinar.topjava.Profiles;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.util.exception.NotFoundException;
 
@@ -33,12 +35,13 @@ import static ru.javawebinar.topjava.UserTestData.USER_ID;
         "classpath:spring/spring-db.xml"
 })
 @RunWith(SpringRunner.class)
+@ActiveProfiles({Profiles.DATABASE_IMPLEMENTATION})
 @Sql(scripts = "classpath:db/populateDB.sql", config = @SqlConfig(encoding = "UTF-8"))
-@ActiveProfiles(resolver = ActiveDbProfileResolver.class)
-public class MealServiceTest {
-    private static final Logger log = getLogger("result");
+public abstract class MealServiceTest {
+    protected static final Logger log = getLogger("result");
+    protected static String className="MealService abstract";
 
-    private static StringBuilder results = new StringBuilder();
+    protected static StringBuilder results = new StringBuilder();
 
     @Rule
     public ExpectedException thrown = ExpectedException.none();
@@ -62,14 +65,16 @@ public class MealServiceTest {
     @AfterClass
     public static void printResult() {
         log.info("\n---------------------------------" +
+                "\nNAME = "+className+
                 "\nTest                 Duration, ms" +
                 "\n---------------------------------" +
                 results +
                 "\n---------------------------------");
+        results=new StringBuilder();
     }
 
     @Autowired
-    private MealService service;
+    protected MealService service;
 
     @Test
     public void testDelete() throws Exception {
