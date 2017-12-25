@@ -87,7 +87,6 @@ public class JdbcUserRepositoryImpl implements UserRepository {
                         "registered=:registered, enabled=:enabled, calories_per_day=:caloriesPerDay WHERE id=:id", parameterSource) == 0) {
             return null;
         } else jdbcTemplate.update("DELETE FROM user_roles WHERE user_id=?", user.getId());
-        System.out.println(user.getRoles().toArray()[0].getClass().getSimpleName());
         final ArrayList<Role> roles = new ArrayList<>(user.getRoles());
 
         jdbcTemplate.batchUpdate("INSERT INTO user_roles (user_id, role) VALUES (?,?)", new BatchPreparedStatementSetter() {
