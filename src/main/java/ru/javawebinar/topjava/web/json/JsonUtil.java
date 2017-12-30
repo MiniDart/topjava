@@ -39,14 +39,14 @@ public class JsonUtil {
         }
     }
 
-    public static <T> String writeIgnoreProps(Collection<T> collection, String... ignoreProps) {
+    public static <T> String writeIgnoreProps(Collection<T> collection, String[] ignoreProps) {
         List<Map<String, Object>> list = collection.stream()
                 .map(e -> getAsMapWithIgnore(e, ignoreProps))
                 .collect(Collectors.toList());
         return writeValue(list);
     }
 
-    public static <T> String writeIgnoreProps(T obj, String... ignoreProps) {
+    public static <T> String writeIgnoreProps(T obj, String[] ignoreProps) {
         Map<String, Object> map = getAsMapWithIgnore(obj, ignoreProps);
         return writeValue(map);
     }
