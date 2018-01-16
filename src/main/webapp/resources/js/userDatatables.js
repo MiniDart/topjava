@@ -39,4 +39,31 @@ $(function () {
         ]
     });
     makeEditable();
+    prepareInputEnabled();
 });
+
+function updateTable() {
+    $.get(ajaxUrl, function (data) {
+        datatableApi.clear().rows.add(data).draw();
+       prepareInputEnabled()
+    });
+}
+
+function prepareInputEnabled() {
+    $("input[name=enabled]").change(function () {
+        var enabled;
+        if (this.checked){
+            enabled="true"
+        }
+        else enabled="false";
+        $.ajax({
+            type: "POST",
+            url: ajaxUrl,
+            data: {enabled: enabled,
+            id:$(this).closest("tr").attr("id")},
+            success: function () {
+                updateTable();
+            }
+        })
+    });
+}

@@ -2,6 +2,7 @@ package ru.javawebinar.topjava.web.user;
 
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import ru.javawebinar.topjava.AuthorizedUser;
 import ru.javawebinar.topjava.model.Role;
 import ru.javawebinar.topjava.model.User;
 
@@ -24,14 +25,22 @@ public class AdminAjaxController extends AbstractUserController {
     }
 
     @PostMapping
-    public void createOrUpdate(@RequestParam("id") Integer id,
-                               @RequestParam("name") String name,
-                               @RequestParam("email") String email,
-                               @RequestParam("password") String password) {
-
+    public void createOrUpdate(@RequestParam(value = "id", required = false) Integer id,
+                               @RequestParam(value = "name", required = false) String name,
+                               @RequestParam(value = "email", required = false) String email,
+                               @RequestParam(value = "password", required = false) String password,
+                               @RequestParam(value = "enabled", required = false) String enabled) {
+        if (enabled!=null){
+            User user=get(id);
+            user.setEnabled("true".equals(enabled));
+            super.update(user,id);
+            return;
+        }
         User user = new User(id, name, email, password, Role.ROLE_USER);
         if (user.isNew()) {
             super.create(user);
+        }
+        else {
         }
     }
 }

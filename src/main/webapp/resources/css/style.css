@@ -34,3 +34,7 @@ header, footer {
 .glyphicon {
     cursor: pointer;
 }
+
+#datatable tr.disabled{
+    background: #929292;
+}
